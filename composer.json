@@ -1,0 +1,19 @@
+{
+	"name": "silverstripe-labs/translatablemodeladmin",
+	"description": "This module provides additional developer tools for creating
+		ModelAdmin interfaces on Translatable data objects. It doesn't provide any
+		new functionality out of the box; you will need to write code against the
+		new APIs in order to use it.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe-labs", "translatablemodeladmin", "translation"],
+	"authors": [
+	{
+		"name": "Sam Minnée",
+		"email": "sam@silverstripe.com"
+	}
+	],
+	"require":
+	{
+		"silverstripe/framework": "2.4.*"
+	}
+}
