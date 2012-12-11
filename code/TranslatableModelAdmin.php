@@ -13,6 +13,7 @@ abstract class TranslatableModelAdmin extends ModelAdmin {
 	public $Locale = null;
 	
 	function init() {
+		Requirements::set_combined_files_enabled(false); // Is there a better way?
 		parent::init();
 		Requirements::customScript("SiteTreeHandlers.controller_url = '" . $this->Link() . "';");
 		Requirements::block(CMS_DIR . '/javascript/TranslationTab.js');
