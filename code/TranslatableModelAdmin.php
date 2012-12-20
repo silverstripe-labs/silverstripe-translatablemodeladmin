@@ -15,9 +15,10 @@ abstract class TranslatableModelAdmin extends ModelAdmin {
 	function init() {
 		parent::init();
 		Requirements::customScript("SiteTreeHandlers.controller_url = '" . $this->Link() . "';");
-		Requirements::block(CMS_DIR . '/javascript/TranslationTab.js');
-		Requirements::block(CMS_DIR . '/javascript/LangSelector.js');
+		//Requirements::block(CMS_DIR . '/javascript/TranslationTab.js');
+		//Requirements::block(CMS_DIR . '/javascript/LangSelector.js');
 		Requirements::javascript('translatablemodeladmin/javascript/TranslatableModelAdmin.js');
+
 		
 		// Similar to CMSMain->init()
 		if($this->getRequest()->requestVar("Locale")) {
@@ -81,7 +82,7 @@ class TranslatableModelAdmin_CollectionController extends ModelAdmin_CollectionC
 	
 	function SearchForm() {
 		$form = parent::SearchForm();
-		$form->Fields()->push(new HiddenField('Locale', null, $this->parentController->Locale));
+		$form->Fields()->push(new HiddenField('Locale', null, Translatable::get_current_locale()));
 		
 		return $form;
 	}
@@ -149,8 +150,25 @@ class TranslatableModelAdmin_RecordController extends ModelAdmin_RecordControlle
 			$table->setPermissions(array('show'));
 			if(!$sourceItems = $this->currentRecord->getTranslations()){
 				$sourceItems = new DataObjectSet();
+				
 			}
+			
+			
+			$n=count($sourceItems->items);
+			
+			$existingTransHTML = '<ul id="_translation_link">';
+			for ($i=0;$i<$n;$i++) {
+			   $t=explode("/",$this->requestParams['url']);
+			   $url = 'admin/'.$t[2].'/'.$sourceItems->items[$i]->ClassName.'/'.$sourceItems->items[$i]->ID.'/edit/?locale='.$sourceItems->items[$i]->Locale;
+				 $existingTransHTML .= '<li><a href="'.$url.'">'.$sourceItems->items[$i]->Title.'</a></li>';
+			}
+			$existingTransHTML .= '</ul>';
+			
+			
+			$translationsList = new LiteralField('existingtrans',$existingTransHTML);			  
+			
 			$table->setCustomSourceItems($sourceItems);
+			
 			$action->includeDefaultJS = false;
 			if($form->Fields()->hasTabSet()) {
 				$form->Fields()->findOrMakeTab(
@@ -158,7 +176,8 @@ class TranslatableModelAdmin_RecordController extends ModelAdmin_RecordControlle
 					_t("TranslatableModelAdmin.TRANSLATIONSTAB", "Translations")
 				);
 				$form->Fields()->addFieldToTab('Root.Translations', $header);
-				$form->Fields()->addFieldToTab('Root.Translations', $table);
+				$form->Fields()->addFieldToTab('Root.Translations',$translationsList);
+				//$form->Fields()->addFieldToTab('Root.Translations', $table);
 				$form->Fields()->addFieldToTab('Root.Translations', $dropdown);
 				$form->Fields()->addFieldToTab('Root.Translations', $action);
 			} else {
@@ -167,7 +186,8 @@ class TranslatableModelAdmin_RecordController extends ModelAdmin_RecordControlle
 					_t("TranslatableModelAdmin.TRANSLATIONSTAB", "Translations")
 				));
 				$form->Fields()->push($header);
-				$form->Fields()->push($table);
+				$form->Fields()->push($translationsList);
+				//$form->Fields()->push($table);
 				$form->Fields()->push($dropdown);
 				$form->Fields()->push($action);
 			}
@@ -175,6 +195,8 @@ class TranslatableModelAdmin_RecordController extends ModelAdmin_RecordControlle
 			$form->Fields()->setForm($form);
 			
 		}
+		
+		
 		
 		return $form;
 	}
