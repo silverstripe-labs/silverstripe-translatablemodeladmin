@@ -14,10 +14,13 @@ abstract class TranslatableModelAdmin extends ModelAdmin {
 	
 	function init() {
 		parent::init();
+		Requirements::clear(CMS_DIR . '/javascript/LangSelector.js');
 		Requirements::customScript("SiteTreeHandlers.controller_url = '" . $this->Link() . "';");
 		Requirements::block(CMS_DIR . '/javascript/TranslationTab.js');
-		Requirements::block(CMS_DIR . '/javascript/LangSelector.js');
-		Requirements::javascript('translatablemodeladmin/javascript/TranslatableModelAdmin.js');
+		Requirements::javascript('translatablemodeladmin/javascript/TranslatableLangSelector.js');
+		$vars = array('SECURITY_ID' => Session::get('SecurityID'));
+		Requirements::javascript('sapphire/thirdparty/jquery-livequery/jquery.livequery.js');
+		Requirements::javascriptTemplate('translatablemodeladmin/javascript/TranslatableModelAdmin.js', $vars);
 		
 		// Similar to CMSMain->init()
 		if($this->getRequest()->requestVar("Locale")) {
